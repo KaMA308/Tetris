@@ -6,8 +6,6 @@ def main():
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Tetris')
 
-
-
     while pygame.event.wait().type != pygame.QUIT:
         pygame.display.flip()
 
