@@ -3,6 +3,34 @@ import copy
 from random import choice
 from time import sleep
 
+pygame.init()
+
+size = width, height = 600, 800
+screen = pygame.display.set_mode(size)
+pygame.display.set_caption('Tetris')
+
+
+class Button:
+    def __init__(self, width_but, height_but, text, color):
+
+        self.width = width_but
+        self.height = height_but
+        self.text = text
+        self.color = color
+
+    def draw(self, x, y):
+        pygame.draw.rect(screen, (43, 66, 158), (x, y, self.width, self.height))
+        font = pygame.font.Font('font/main_font.otf', 45)
+        text = font.render(self.text, True, pygame.Color('white'))
+        screen.blit(text, (x, y))
+
+        # if pygame.mouse.get_pressed()[0]:
+        if x < pygame.mouse.get_pos()[0] < x + self.width and y < pygame.mouse.get_pos()[1] < y + self.height:
+            pygame.draw.rect(screen, (0, 0, 0), (x, y, self.width, self.height), 3)
+            if pygame.mouse.get_pressed()[0]:
+                pygame.quit()
+                exit()
+
 
 def main():
     def get_record():
@@ -18,14 +46,8 @@ def main():
         with open('record.txt', 'w') as f:
             f.write(str(record))
 
-    pygame.init()
-
     w, h = 10, 20
     cell = 35
-
-    size = width, height = 600, 800
-    screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('Tetris')
 
     play_zone = pygame.Surface((350, 700))
     play_zone.fill((18, 28, 89))
@@ -51,7 +73,7 @@ def main():
 
     font = pygame.font.Font('font/main_font.otf', 45)
     small_font = pygame.font.Font('font/main_font.otf', 40)
-    over_font = pygame.font.Font('font/main_font.otf', 45)
+
 
     score = 0
     score_title = small_font.render('Score:', True, pygame.Color('white'))
@@ -64,6 +86,8 @@ def main():
     lim_speed = 1600
 
     net = [pygame.Rect(x * cell, y * cell, cell, cell) for x in range(w) for y in range(h)]
+
+    button = Button(100, 50, 'Exit', (0, 0, 0))
 
     clock = pygame.time.Clock()
     FPS = 60
@@ -78,15 +102,20 @@ def main():
         play_zone.fill((18, 28, 89))
 
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 running = False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     pos = -1
+
                 elif event.key == pygame.K_RIGHT:
                     pos = 1
+
                 elif event.key == pygame.K_UP:
                     rotate = True
+
                 elif event.key == pygame.K_DOWN:
                     speed = 400
 
@@ -173,8 +202,10 @@ def main():
                 screen.blit(play_zone, (50, 50))
                 pygame.display.flip()
                 clock.tick(100)
+
             field = [[0 for i in range(w)] for j in range(h)]
             old_record = int(get_record())
+
             if score > old_record:
                 for i in range(3):
                     count_record = small_font.render(get_record(), True, pygame.Color('white'))
@@ -196,15 +227,20 @@ def main():
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
+
                     sleep(0.1)
+
                     pygame.draw.rect(screen, (43, 66, 158), (410, 440, 200, 50))
                     pygame.display.flip()
 
             screen.blit(count_record, (410, 440))
             pygame.display.flip()
+
             set_record(max(score, old_record))
             count_record = small_font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
+
+        button.draw(410, 600)
 
         pygame.display.flip()
         clock.tick(FPS)
