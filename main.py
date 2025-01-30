@@ -52,7 +52,7 @@ class Button:
 
             if pygame.mouse.get_pressed()[0]:
                 pygame.mixer.music.stop()
-                pygame.mixer.Sound('sound/push1.mp3').play()
+                pygame.mixer.Sound('sound/push.mp3').play()
 
                 sleep(0.2)
 
@@ -303,7 +303,6 @@ def main():
                     pygame.draw.rect(play_zone, col, shape_rect)
 
         # отрисовка информации
-        # screen.blit(title, (410, 50))
         screen.blit(record_title, (410, 400))
         screen.blit(count_record, (410, 440))
         screen.blit(score_title, (410, 500))
@@ -327,7 +326,7 @@ def main():
             old_record = int(get_record())
 
             if score > old_record:
-                push_bt = pygame.mixer.Sound('sound/push1.mp3').play()
+                push_bt = pygame.mixer.Sound('sound/push.mp3').play()
                 for _ in range(3):
                     push_bt.stop()
                     count_record = small_font.render(get_record(), True, pygame.Color('white'))
@@ -335,7 +334,7 @@ def main():
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
                     sleep(0.5)
-                    push_bt = pygame.mixer.Sound('sound/push1.mp3').play()
+                    push_bt = pygame.mixer.Sound('sound/push.mp3').play()
                     pygame.draw.rect(screen, (43, 66, 158), (410, 400, 200, 100))
                     pygame.display.flip()
                     sleep(0.5)
