@@ -51,10 +51,16 @@ class Button:
             screen.blit(text, (x, y))
 
             if pygame.mouse.get_pressed()[0]:
+                pygame.mixer.music.stop()
+                pygame.mixer.Sound('sound/push1.mp3').play()
+
+                sleep(0.2)
+
                 transilition(self.text)
 
 
 def filling():
+    load_g = pygame.mixer.Sound('sound/load_game1.mp3').play()
     FPS = 50
     for i in range(0, width, 100):
         for j in range(0, height, 100):
@@ -62,10 +68,12 @@ def filling():
             pygame.draw.rect(screen, (pygame.Color('White')), ((i, j), (100, 100)), 3)
             pygame.display.flip()
             clock.tick(FPS)
+    load_g.stop()
 
 
 def transilition(text):
     if text == 'Exit':
+
         filling()
         menu()
 
@@ -89,7 +97,8 @@ def snow_fall():
 
 
 def menu():
-
+    pygame.mixer.music.load('sound/Tetris Theme.mp3')
+    pygame.mixer.music.play(-1)
 
     screen.fill((43, 66, 158))
     title_pic = pygame.image.load('images/Title.png')
@@ -121,6 +130,8 @@ def menu():
 
 
 def main():
+    pygame.mixer.music.play(-1)
+
     def get_record():
         try:
             with open('record.txt', 'r') as f:
@@ -187,6 +198,7 @@ def main():
 
     running = True
     while running:
+
         pos = 0
         rotate = False
 
@@ -300,6 +312,7 @@ def main():
 
         # проверка на проигрыш
         if any(field[4]):
+            pygame.mixer.music.stop()
             speed = 100
             count_speed = 0
 
@@ -314,21 +327,25 @@ def main():
             old_record = int(get_record())
 
             if score > old_record:
+                push_bt = pygame.mixer.Sound('sound/push1.mp3').play()
                 for _ in range(3):
+                    push_bt.stop()
                     count_record = small_font.render(get_record(), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
                     sleep(0.5)
+                    push_bt = pygame.mixer.Sound('sound/push1.mp3').play()
                     pygame.draw.rect(screen, (43, 66, 158), (410, 400, 200, 100))
                     pygame.display.flip()
                     sleep(0.5)
 
                 n = 5
+
                 if score - old_record > 100:
                     f = len(str(score - old_record))
                     n = 10 * (f - 2)
-
+                score_snd = pygame.mixer.Sound('sound/scoreboard.mp3').play()
                 for num in range(old_record, score + 1, n):
                     count_record = small_font.render(str(num), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
@@ -339,13 +356,14 @@ def main():
 
                     pygame.draw.rect(screen, (43, 66, 158), (410, 440, 200, 50))
                     pygame.display.flip()
-
+                score_snd.stop()
             screen.blit(count_record, (410, 440))
             pygame.display.flip()
 
             set_record(max(score, old_record))
             count_record = small_font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
+            pygame.mixer.music.play(-1)
 
         exit_btn.draw(410, 600)
 
