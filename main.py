@@ -10,7 +10,17 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Tetris')
 # иконку
 clock = pygame.time.Clock()
-FPS = 60
+
+snow = []
+count_snow = 400
+max_size = 5
+
+for i in range(count_snow):
+    x_snow = randint(0, width)
+    y_snow = randint(0, height)
+    size_snow = randint(1, 5)
+
+    snow.append([x_snow, y_snow, size_snow])
 
 
 class Button:
@@ -44,6 +54,20 @@ def transilition(text):
         main()
 
 
+def snow_fall():
+    for i in range(count_snow):
+        x_snow = snow[i][0]
+        y_snow = snow[i][1]
+        size_snow = snow[i][2]
+
+        pygame.draw.circle(screen, tuple([51 * size_snow] * 3), (x_snow, y_snow), size_snow)
+        if y_snow > height:
+            y_snow = -size_snow
+        if x_snow > width:
+            x_snow = -size_snow
+        snow[i] = [x_snow + size_snow, y_snow + size_snow, size_snow]
+
+
 def menu():
     screen.fill((43, 66, 158))
     title_pic = pygame.image.load('images/Title.png')
@@ -52,19 +76,23 @@ def menu():
 
     play_btn = Button(185, 90, 'PLAY', (0, 0, 0), 70)
 
-
+    FPS = 30
 
     running = True
 
     while running:
         screen.fill((43, 66, 158))
+
+        # Отрисовка снега
+        snow_fall()
+
         screen.blit(title_pic, (140, 200))
         play_btn.draw(200, 400)
 
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                running = False
+                exit()
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -100,8 +128,7 @@ def main():
                  [(0, 0), (0, -1), (0, 1), (1, -1)],
                  [(0, 0), (0, -1), (0, 1), (-1, 0)]]
 
-    colors = [pygame.Color('red'), pygame.Color('green'), pygame.Color('blue'), pygame.Color('yellow'),
-              pygame.Color('purple'), pygame.Color('orange'), pygame.Color('cyan')]
+    colors = [(238, 34, 39), (246, 143, 33), (253, 208, 37), (88, 185, 70), (23, 189, 234), (165, 56, 151)]
     color, next_color = choice(colors), choice(colors)
 
     shapes = [[pygame.Rect(x + w // 2, y + 1, 1, 1) for x, y in sha_pos] for sha_pos in shape_pos]
@@ -126,19 +153,25 @@ def main():
 
     exit_btn = Button(100, 50, 'Exit', (255, 255, 255), 45)
 
+    FPS = 60
+
     running = True
     while running:
         pos = 0
         rotate = False
 
         screen.fill((43, 66, 158))
+
+        # Отрисовка снега
+        snow_fall()
+
         screen.blit(play_zone, (50, 50))
         play_zone.fill((18, 28, 89))
 
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                running = False
+                exit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -198,8 +231,12 @@ def main():
         score += count_line * 100
         count_score = small_font.render(str(score), True, pygame.Color('white'))
 
+        # Отрисовка сети
         for i in net:
             pygame.draw.rect(play_zone, (80, 80, 80), i, 1)
+
+        pygame.draw.line(play_zone, (84, 3, 3), (0, 140), (350, 140), 2)
+
         # отрисовка фигуры
         for i in range(4):
             shape_rect.x = shape[i].x * cell
@@ -233,6 +270,7 @@ def main():
 
             for i in net:
                 pygame.draw.rect(play_zone, choice(colors), i, 0)
+                pygame.draw.rect(play_zone, pygame.Color('White'), i, 1)
                 screen.blit(play_zone, (50, 50))
                 pygame.display.flip()
                 clock.tick(100)
