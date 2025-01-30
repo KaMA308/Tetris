@@ -310,7 +310,7 @@ def main():
         screen.blit(title_pic, (415, 50))
 
         # проверка на проигрыш
-        if any(field[4]):
+        if any(field[3]):
             pygame.mixer.music.stop()
             speed = 100
             count_speed = 0
