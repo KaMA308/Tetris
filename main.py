@@ -1,6 +1,6 @@
 import pygame
 import copy
-from random import choice
+from random import choice, randint
 from time import sleep
 
 pygame.init()
@@ -8,28 +8,66 @@ pygame.init()
 size = width, height = 600, 800
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Tetris')
+# иконку
+clock = pygame.time.Clock()
+FPS = 60
 
 
 class Button:
-    def __init__(self, width_but, height_but, text, color):
+    def __init__(self, width_but, height_but, text, color, size_font):
 
         self.width = width_but
         self.height = height_but
         self.text = text
         self.color = color
+        self.size_font = size_font
 
     def draw(self, x, y):
         pygame.draw.rect(screen, (43, 66, 158), (x, y, self.width, self.height))
-        font = pygame.font.Font('font/main_font.otf', 45)
+        font = pygame.font.Font('font/main_font.otf', self.size_font)
         text = font.render(self.text, True, pygame.Color('white'))
         screen.blit(text, (x, y))
 
         # if pygame.mouse.get_pressed()[0]:
         if x < pygame.mouse.get_pos()[0] < x + self.width and y < pygame.mouse.get_pos()[1] < y + self.height:
-            pygame.draw.rect(screen, (0, 0, 0), (x, y, self.width, self.height), 3)
+            pygame.draw.rect(screen, (255, 255, 255), (x, y, self.width, self.height), 0)
+            text = font.render(self.text, True, pygame.Color('Black'))
+            screen.blit(text, (x, y))
             if pygame.mouse.get_pressed()[0]:
-                pygame.quit()
-                exit()
+                transilition(self.text)
+
+
+def transilition(text):
+    if text == 'Exit':
+        menu()
+    elif text == 'PLAY':
+        main()
+
+
+def menu():
+    screen.fill((43, 66, 158))
+    title_pic = pygame.image.load('images/Title.png')
+    title_pic = pygame.transform.smoothscale(title_pic, (300, 200))
+    title_pic.convert()
+
+    play_btn = Button(185, 90, 'PLAY', (0, 0, 0), 70)
+
+
+
+    running = True
+
+    while running:
+        screen.fill((43, 66, 158))
+        screen.blit(title_pic, (140, 200))
+        play_btn.draw(200, 400)
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                running = False
+
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def main():
@@ -74,7 +112,6 @@ def main():
     font = pygame.font.Font('font/main_font.otf', 45)
     small_font = pygame.font.Font('font/main_font.otf', 40)
 
-
     score = 0
     score_title = small_font.render('Score:', True, pygame.Color('white'))
     record_title = small_font.render('Record:', True, pygame.Color('white'))
@@ -87,10 +124,7 @@ def main():
 
     net = [pygame.Rect(x * cell, y * cell, cell, cell) for x in range(w) for y in range(h)]
 
-    button = Button(100, 50, 'Exit', (0, 0, 0))
-
-    clock = pygame.time.Clock()
-    FPS = 60
+    exit_btn = Button(100, 50, 'Exit', (255, 255, 255), 45)
 
     running = True
     while running:
@@ -240,11 +274,11 @@ def main():
             count_record = small_font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
 
-        button.draw(410, 600)
+        exit_btn.draw(410, 600)
 
         pygame.display.flip()
         clock.tick(FPS)
 
 
 if __name__ == '__main__':
-    main()
+    menu()
