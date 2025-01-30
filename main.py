@@ -8,9 +8,13 @@ pygame.init()
 size = width, height = 600, 800
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Tetris')
-# иконку
+
+icon = pygame.image.load('images/Title.png')
+pygame.display.set_icon(icon)
+
 clock = pygame.time.Clock()
 
+# Создание снега
 snow = []
 count_snow = 400
 max_size = 5
@@ -22,7 +26,10 @@ for i in range(count_snow):
 
     snow.append([x_snow, y_snow, size_snow])
 
+colors = [(238, 34, 39), (246, 143, 33), (253, 208, 37), (88, 185, 70), (23, 189, 234), (165, 56, 151)]
 
+
+# Создание кнопок
 class Button:
     def __init__(self, width_but, height_but, text, color, size_font):
 
@@ -38,19 +45,32 @@ class Button:
         text = font.render(self.text, True, pygame.Color('white'))
         screen.blit(text, (x, y))
 
-        # if pygame.mouse.get_pressed()[0]:
         if x < pygame.mouse.get_pos()[0] < x + self.width and y < pygame.mouse.get_pos()[1] < y + self.height:
             pygame.draw.rect(screen, (255, 255, 255), (x, y, self.width, self.height), 0)
             text = font.render(self.text, True, pygame.Color('Black'))
             screen.blit(text, (x, y))
+
             if pygame.mouse.get_pressed()[0]:
                 transilition(self.text)
 
 
+def filling():
+    FPS = 50
+    for i in range(0, width, 100):
+        for j in range(0, height, 100):
+            pygame.draw.rect(screen, (choice(colors)), ((i, j), (100, 100)))
+            pygame.draw.rect(screen, (pygame.Color('White')), ((i, j), (100, 100)), 3)
+            pygame.display.flip()
+            clock.tick(FPS)
+
+
 def transilition(text):
     if text == 'Exit':
+        filling()
         menu()
+
     elif text == 'PLAY':
+        filling()
         main()
 
 
@@ -69,6 +89,8 @@ def snow_fall():
 
 
 def menu():
+
+
     screen.fill((43, 66, 158))
     title_pic = pygame.image.load('images/Title.png')
     title_pic = pygame.transform.smoothscale(title_pic, (300, 200))
@@ -115,10 +137,14 @@ def main():
     w, h = 10, 20
     cell = 35
 
+    # Выделительные зоны для фигур
     play_zone = pygame.Surface((350, 700))
     play_zone.fill((18, 28, 89))
 
-    field = [[0 for i in range(w)] for j in range(h)]
+    next_fig_zone = pygame.Surface((150, 150))
+    next_fig_zone.fill((18, 28, 89))
+
+    field = [[0 for _ in range(w)] for _ in range(h)]
 
     shape_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
                  [(0, -1), (-1, -1), (-1, 0), (0, 0)],
@@ -128,7 +154,6 @@ def main():
                  [(0, 0), (0, -1), (0, 1), (1, -1)],
                  [(0, 0), (0, -1), (0, 1), (-1, 0)]]
 
-    colors = [(238, 34, 39), (246, 143, 33), (253, 208, 37), (88, 185, 70), (23, 189, 234), (165, 56, 151)]
     color, next_color = choice(colors), choice(colors)
 
     shapes = [[pygame.Rect(x + w // 2, y + 1, 1, 1) for x, y in sha_pos] for sha_pos in shape_pos]
@@ -136,6 +161,7 @@ def main():
     shape_rect = pygame.Rect(0, 0, cell - 2, cell - 2)
     shape, next_shape = copy.deepcopy(choice(shapes)), copy.deepcopy(choice(shapes))
 
+    # Шрифты
     font = pygame.font.Font('font/main_font.otf', 45)
     small_font = pygame.font.Font('font/main_font.otf', 40)
 
@@ -144,7 +170,11 @@ def main():
     record_title = small_font.render('Record:', True, pygame.Color('white'))
     count_record = small_font.render(get_record(), True, pygame.Color('white'))
 
-    title = font.render('TETRIS', True, pygame.Color('white'))
+    # title = font.render('TETRIS', True, pygame.Color('white'))
+    title_pic = pygame.image.load('images/Title.png')
+    title_pic = pygame.transform.smoothscale(title_pic, (170, 100))
+    title_pic.convert()
+
     speed = 100
     count_speed = 0
     lim_speed = 1600
@@ -166,6 +196,7 @@ def main():
         snow_fall()
 
         screen.blit(play_zone, (50, 50))
+        pygame.draw.rect(screen, (80, 80, 80), ((50, 50), (350, 700)), 2)
         play_zone.fill((18, 28, 89))
 
         for event in pygame.event.get():
@@ -237,6 +268,9 @@ def main():
 
         pygame.draw.line(play_zone, (84, 3, 3), (0, 140), (350, 140), 2)
 
+        screen.blit(next_fig_zone, (424, 180))
+        pygame.draw.rect(screen, (80, 80, 80), ((424, 180), (150, 150)), 2)
+
         # отрисовка фигуры
         for i in range(4):
             shape_rect.x = shape[i].x * cell
@@ -246,7 +280,7 @@ def main():
         # отрисовка следующей фигуры
         for i in range(4):
             shape_rect.x = next_shape[i].x * cell + 325
-            shape_rect.y = next_shape[i].y * cell + 150
+            shape_rect.y = next_shape[i].y * cell + 200
             pygame.draw.rect(screen, next_color, shape_rect)
 
         # отрисовка поля
@@ -256,12 +290,13 @@ def main():
                     shape_rect.x, shape_rect.y = x * cell, y * cell
                     pygame.draw.rect(play_zone, col, shape_rect)
 
-        # отрисовка текста
-        screen.blit(title, (410, 50))
+        # отрисовка информации
+        # screen.blit(title, (410, 50))
         screen.blit(record_title, (410, 400))
         screen.blit(count_record, (410, 440))
         screen.blit(score_title, (410, 500))
         screen.blit(count_score, (410, 540))
+        screen.blit(title_pic, (415, 50))
 
         # проверка на проигрыш
         if any(field[4]):
@@ -275,11 +310,11 @@ def main():
                 pygame.display.flip()
                 clock.tick(100)
 
-            field = [[0 for i in range(w)] for j in range(h)]
+            field = [[0 for _ in range(w)] for _ in range(h)]
             old_record = int(get_record())
 
             if score > old_record:
-                for i in range(3):
+                for _ in range(3):
                     count_record = small_font.render(get_record(), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
@@ -294,8 +329,8 @@ def main():
                     f = len(str(score - old_record))
                     n = 10 * (f - 2)
 
-                for i in range(old_record, score + 1, n):
-                    count_record = small_font.render(str(i), True, pygame.Color('white'))
+                for num in range(old_record, score + 1, n):
+                    count_record = small_font.render(str(num), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
