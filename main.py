@@ -3,6 +3,7 @@ import copy
 from random import choice, randint
 from time import sleep
 
+# Инициализация, установка размера окна, установка иконки игры
 pygame.init()
 
 size = width, height = 600, 800
@@ -59,21 +60,24 @@ class Button:
                 transilition(self.text)
 
 
+# Анимация перехода
 def filling():
     load_g = pygame.mixer.Sound('sound/load_game1.mp3').play()
     FPS = 50
+
     for i in range(0, width, 100):
         for j in range(0, height, 100):
             pygame.draw.rect(screen, (choice(colors)), ((i, j), (100, 100)))
             pygame.draw.rect(screen, (pygame.Color('White')), ((i, j), (100, 100)), 3)
             pygame.display.flip()
             clock.tick(FPS)
+
     load_g.stop()
 
 
+# Переход между главным меню и игрой
 def transilition(text):
     if text == 'Exit':
-
         filling()
         menu()
 
@@ -82,6 +86,7 @@ def transilition(text):
         main()
 
 
+# Передвижение снежинок
 def snow_fall():
     for i in range(count_snow):
         x_snow = snow[i][0]
@@ -89,13 +94,17 @@ def snow_fall():
         size_snow = snow[i][2]
 
         pygame.draw.circle(screen, tuple([51 * size_snow] * 3), (x_snow, y_snow), size_snow)
+
         if y_snow > height:
             y_snow = -size_snow
+
         if x_snow > width:
             x_snow = -size_snow
+
         snow[i] = [x_snow + size_snow, y_snow + size_snow, size_snow]
 
 
+# Главное меню
 def menu():
     pygame.mixer.music.load('sound/Tetris Theme.mp3')
     pygame.mixer.music.play(-1)
@@ -114,7 +123,7 @@ def menu():
     while running:
         screen.fill((43, 66, 158))
 
-        # Отрисовка снега
+        # Отрисовка снежинок
         snow_fall()
 
         screen.blit(title_pic, (140, 200))
@@ -129,21 +138,25 @@ def menu():
         clock.tick(FPS)
 
 
+# Основная функция с игрой
 def main():
     pygame.mixer.music.play(-1)
 
+    # Возвращает значение рекорда
     def get_record():
         try:
-            with open('record.txt', 'r') as f:
-                return f.read()
+            with open('record.txt', 'r') as file:
+                return file.read()
+            
         except FileNotFoundError:
-            with open('record.txt', 'w') as f:
-                f.write('0')
+            with open('record.txt', 'w') as file:
+                file.write('0')
                 return '0'
 
+    # Изменяет значение рекорда
     def set_record(record):
-        with open('record.txt', 'w') as f:
-            f.write(str(record))
+        with open('record.txt', 'w') as file:
+            file.write(str(record))
 
     w, h = 10, 20
     cell = 35
@@ -155,7 +168,9 @@ def main():
     next_fig_zone = pygame.Surface((150, 150))
     next_fig_zone.fill((18, 28, 89))
 
+    # Игровое поле
     field = [[0 for _ in range(w)] for _ in range(h)]
+    net = [pygame.Rect(x * cell, y * cell, cell, cell) for x in range(w) for y in range(h)]
 
     shape_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
                  [(0, -1), (-1, -1), (-1, 0), (0, 0)],
@@ -172,16 +187,16 @@ def main():
     shape_rect = pygame.Rect(0, 0, cell - 2, cell - 2)
     shape, next_shape = copy.deepcopy(choice(shapes)), copy.deepcopy(choice(shapes))
 
-    # Шрифты
-    font = pygame.font.Font('font/main_font.otf', 45)
-    small_font = pygame.font.Font('font/main_font.otf', 40)
+    # Шрифт
+    font = pygame.font.Font('font/main_font.otf', 40)
 
+    # Текст
     score = 0
-    score_title = small_font.render('Score:', True, pygame.Color('white'))
-    record_title = small_font.render('Record:', True, pygame.Color('white'))
-    count_record = small_font.render(get_record(), True, pygame.Color('white'))
+    score_title = font.render('Score:', True, pygame.Color('white'))
+    record_title = font.render('Record:', True, pygame.Color('white'))
+    count_record = font.render(get_record(), True, pygame.Color('white'))
 
-    # title = font.render('TETRIS', True, pygame.Color('white'))
+    # Титульная картинка
     title_pic = pygame.image.load('images/Title.png')
     title_pic = pygame.transform.smoothscale(title_pic, (170, 100))
     title_pic.convert()
@@ -189,8 +204,6 @@ def main():
     speed = 100
     count_speed = 0
     lim_speed = 1600
-
-    net = [pygame.Rect(x * cell, y * cell, cell, cell) for x in range(w) for y in range(h)]
 
     exit_btn = Button(100, 50, 'Exit', (255, 255, 255), 45)
 
@@ -231,7 +244,7 @@ def main():
 
         shape_old = copy.deepcopy(shape)
 
-        # передвижение по x
+        # передвижение фигуры по x
         for i in range(4):
             shape[i].x += pos
             if shape[i].x < 0 or shape[i].x > w - 1:
@@ -240,7 +253,7 @@ def main():
 
         count_speed += speed
 
-        # счетчик скорости падения
+        # падение фигуры
         if count_speed >= lim_speed:
             count_speed = 0
             for i in range(4):
@@ -253,7 +266,7 @@ def main():
                     speed = 100
                     break
 
-        # поворот
+        # поворот фигуры
         if rotate:
             for i in range(4):
                 x = shape[i].y - shape[0].y
@@ -263,6 +276,7 @@ def main():
                 if shape[i].x < 0 or shape[i].x > w - 1 or shape[i].y > h - 1 or field[shape[i].y][shape[i].x]:
                     shape = copy.deepcopy(shape_old)
                     break
+
         # проверка линий и подсчет очков
         line, count_line = h - 1, 0
         for row in range(h - 1, -1, -1):
@@ -272,7 +286,7 @@ def main():
                     field.pop(row)
                     field.insert(0, [0] * w)
         score += count_line * 100
-        count_score = small_font.render(str(score), True, pygame.Color('white'))
+        count_score = font.render(str(score), True, pygame.Color('white'))
 
         # Отрисовка сети
         for i in net:
@@ -325,11 +339,13 @@ def main():
             field = [[0 for _ in range(w)] for _ in range(h)]
             old_record = int(get_record())
 
+            # Анимации проигрыша
             if score > old_record:
                 push_bt = pygame.mixer.Sound('sound/push.mp3').play()
+
                 for _ in range(3):
                     push_bt.stop()
-                    count_record = small_font.render(get_record(), True, pygame.Color('white'))
+                    count_record = font.render(get_record(), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
@@ -344,9 +360,11 @@ def main():
                 if score - old_record > 100:
                     f = len(str(score - old_record))
                     n = 10 * (f - 2)
+
                 score_snd = pygame.mixer.Sound('sound/scoreboard.mp3').play()
+
                 for num in range(old_record, score + 1, n):
-                    count_record = small_font.render(str(num), True, pygame.Color('white'))
+                    count_record = font.render(str(num), True, pygame.Color('white'))
                     screen.blit(record_title, (410, 400))
                     screen.blit(count_record, (410, 440))
                     pygame.display.flip()
@@ -355,12 +373,14 @@ def main():
 
                     pygame.draw.rect(screen, (43, 66, 158), (410, 440, 200, 50))
                     pygame.display.flip()
+
                 score_snd.stop()
+
             screen.blit(count_record, (410, 440))
             pygame.display.flip()
 
             set_record(max(score, old_record))
-            count_record = small_font.render(get_record(), True, pygame.Color('white'))
+            count_record = font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
             pygame.mixer.music.play(-1)
 
