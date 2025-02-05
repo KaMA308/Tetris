@@ -13,6 +13,8 @@ pygame.display.set_caption('Tetris')
 icon = pygame.image.load('images/Title.png')
 pygame.display.set_icon(icon)
 
+load_g = pygame.mixer.Sound('sound/load_game1.mp3')
+
 clock = pygame.time.Clock()
 
 # Создание снега
@@ -62,7 +64,7 @@ class Button:
 
 # Анимация перехода
 def filling():
-    load_g = pygame.mixer.Sound('sound/load_game1.mp3').play()
+    load_g.play()
     FPS = 50
 
     for i in range(0, width, 100):
@@ -224,8 +226,6 @@ def main():
         pygame.draw.rect(screen, (80, 80, 80), ((50, 50), (350, 700)), 2)
         play_zone.fill((18, 28, 89))
 
-
-
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -255,7 +255,6 @@ def main():
                 break
 
         count_speed += speed
-        print(speed)
 
         # падение фигуры
         if count_speed >= lim_speed:
@@ -269,8 +268,8 @@ def main():
                     color, next_color = next_color, choice(colors)
                     shape, next_shape = next_shape, copy.deepcopy(choice(shapes))
                     speed = score // 2 + 100
-                    if speed > 200:
-                        speed = 200
+                    if speed > 250:
+                        speed = 250
                     break
 
         # поворот фигуры
@@ -336,7 +335,6 @@ def main():
             pygame.mixer.music.stop()
             pygame.mixer.Sound('sound/game over.mp3').play()
 
-
             for i in net:
                 pygame.draw.rect(play_zone, choice(colors), i, 0)
                 pygame.draw.rect(play_zone, pygame.Color('White'), i, 1)
@@ -394,8 +392,6 @@ def main():
             count_record = font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
             pygame.mixer.music.play(-1)
-
-
 
         exit_btn.draw(410, 600)
 
