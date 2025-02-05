@@ -147,7 +147,7 @@ def main():
         try:
             with open('record.txt', 'r') as file:
                 return file.read()
-            
+
         except FileNotFoundError:
             with open('record.txt', 'w') as file:
                 file.write('0')
@@ -224,6 +224,8 @@ def main():
         pygame.draw.rect(screen, (80, 80, 80), ((50, 50), (350, 700)), 2)
         play_zone.fill((18, 28, 89))
 
+
+
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -240,6 +242,7 @@ def main():
                     rotate = True
 
                 elif event.key == pygame.K_DOWN:
+                    old_speed = speed
                     speed = 400
 
         shape_old = copy.deepcopy(shape)
@@ -252,6 +255,7 @@ def main():
                 break
 
         count_speed += speed
+        print(speed)
 
         # падение фигуры
         if count_speed >= lim_speed:
@@ -259,11 +263,14 @@ def main():
             for i in range(4):
                 shape[i].y += 1
                 if shape[i].y > h - 1 or field[shape[i].y][shape[i].x]:
+                    pygame.mixer.Sound('sound/shape sound.mp3').play()
                     for i in range(4):
                         field[shape_old[i].y][shape_old[i].x] = color
                     color, next_color = next_color, choice(colors)
                     shape, next_shape = next_shape, copy.deepcopy(choice(shapes))
-                    speed = 100
+                    speed = score // 2 + 100
+                    if speed > 200:
+                        speed = 200
                     break
 
         # поворот фигуры
@@ -286,6 +293,7 @@ def main():
                     field.pop(row)
                     field.insert(0, [0] * w)
         score += count_line * 100
+
         count_score = font.render(str(score), True, pygame.Color('white'))
 
         # Отрисовка сети
@@ -326,8 +334,8 @@ def main():
         # проверка на проигрыш
         if any(field[3]):
             pygame.mixer.music.stop()
-            speed = 100
-            count_speed = 0
+            pygame.mixer.Sound('sound/game over.mp3').play()
+
 
             for i in net:
                 pygame.draw.rect(play_zone, choice(colors), i, 0)
@@ -374,6 +382,9 @@ def main():
                     pygame.draw.rect(screen, (43, 66, 158), (410, 440, 200, 50))
                     pygame.display.flip()
 
+                speed = 100
+                score = 0
+                count_speed = 0
                 score_snd.stop()
 
             screen.blit(count_record, (410, 440))
@@ -383,6 +394,8 @@ def main():
             count_record = font.render(get_record(), True, pygame.Color('white'))
             sleep(1)
             pygame.mixer.music.play(-1)
+
+
 
         exit_btn.draw(410, 600)
 
