@@ -323,6 +323,8 @@ def main():
                     shape_rect.x, shape_rect.y = x * cell, y * cell
                     pygame.draw.rect(play_zone, col, shape_rect)
 
+
+
         # отрисовка информации
         screen.blit(record_title, (410, 400))
         screen.blit(count_record, (410, 440))
@@ -380,6 +382,9 @@ def main():
                     pygame.draw.rect(screen, (43, 66, 158), (410, 440, 200, 50))
                     pygame.display.flip()
 
+                set_record(max(score, int(get_record())))
+                count_record = font.render(str(score), True, pygame.Color('white'))
+
                 speed = 100
                 score = 0
                 count_speed = 0
@@ -388,8 +393,7 @@ def main():
             screen.blit(count_record, (410, 440))
             pygame.display.flip()
 
-            set_record(max(score, old_record))
-            count_record = font.render(get_record(), True, pygame.Color('white'))
+
             sleep(1)
             pygame.mixer.music.play(-1)
 
